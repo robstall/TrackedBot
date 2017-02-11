@@ -5,8 +5,12 @@ $fn = 64;
 //pitch = 3.14 * 40 / 9; // Prototype's values
 //diameter = pitch * teeth / 3.14;
 function rimDiameterForTeeth(teeth) = (40 / 9) * teeth;
+function pitch() = 3.14 * 40 / 9;
+
+//function wheelBase(links, teeth) = rimDiameterForTeeth(teeth)
 
 module cog(teeth=9, cogWidth=7, rimThickness=5) {
+  echo("pitch", pitch());
   color("red") {
     rimDiameter = rimDiameterForTeeth(teeth);
     
