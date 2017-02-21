@@ -53,9 +53,10 @@ module tooth(height=4.3,width=6,base=4,top=2.5) {
 }
 
 module hubAndSpokes(diameter=40, width=6) {
+  hubDiameter = 25.4 / 2;
   difference() {
     union() {
-      cylinder(h=width, d=11);
+      cylinder(h=width, d=hubDiameter);
       spokeThickness = 3;
       for (i = [0:1]) {
         rotate([0, 0, 90*i]) {
@@ -69,7 +70,7 @@ module hubAndSpokes(diameter=40, width=6) {
           }
         }
     }
-    translate([0, 0, -.1]) cylinder(d=6,h=width+.2);
+    translate([0, 0, -.1]) cylinder(d=25.4/4,h=width+.2);
   }
 }
 
@@ -77,4 +78,10 @@ module coaster(teeth=9) {
   cog(teeth);
 }
 
-coaster();
+module driveWheel(teeth=9, axelLength=25.4*.75) {
+  coaster(teeth);
+  cylinder(d=25.4/4, h=axelLength);
+}
+
+//coaster();
+driveWheel();
