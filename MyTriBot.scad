@@ -9,8 +9,8 @@ mm = 25.4; // mm per inch
 dim = [140, 75, 30]; // dim of frame
 thk = 3; // wall thickness
 wb = 98; // wheelbase
-axelSocketLen = 17.5; // Axel socket lenght
-servoShaftX = 21;
+axelSocketLen = 19.5; // Axel socket lenght
+servoShaftX = 23;
 servoShaftZ = servoS9001Size()[1]/2;
 screwDiam = 2.2;
 screwLocations = [
@@ -24,21 +24,24 @@ halfModel = false;
 drawDrive = false;
 drawBatteries = false;
 drawRpi = false;
-drawSideRail = true;
-drawBottom = true;
-drawTop = false;
-drawEnd = true;
-drawAxelSocket = true;
+drawSideRail = false;
+drawBottom = false;
+drawTop = true;
+drawEnd = false;
+drawAxelSocket = false;
 drawWheelbase = false;
-drawFrontCoaster = true;
-drawScrewPosts = true;
+drawFrontCoaster = false;
+drawScrewPosts = false;
 drawFrontAxel = false;
-drawDriveWheel = true;
+drawDriveWheel = false;
+drawSideStiff = false;
 
 drawHalfBot();
 if (halfModel == false) {
   mirror([0,1,0]) drawHalfBot();
 }
+
+//color("red") translate([15, -56, 15]) cube([10,15,2]);
 
 module drive() {
   translate([servoShaftX, 0, servoShaftZ]) 
@@ -63,7 +66,7 @@ module driveCutout() {
     }
   }
   d = servoS9001Size();
-  translate([10.1, d[1]+8, -1]) cube([d[0]+1, 3, thk+2]);
+  translate([12.1, d[1]+8, -1]) cube([d[0]+1, 3, thk+2]);
 }
 
 module screwPost() {
@@ -104,17 +107,18 @@ module bottom() {
     translate([0, -dim[1]/2, 0]) {
       difference() {
         cube([dim[0], dim[1]/2, thk]);
-        holePattern(xcnt=7, ycnt=3, xoff=dim[0]/2-10, yoff=7.5);
+        holePattern(xcnt=7, ycnt=3, xoff=dim[0]/2-10, yoff=7.5, large=false);
+        translate([dim[0]-dim[1]+2.5, 5, 1.5]) cube([dim[1]-10, dim[1]-10, thk]);
       }
     }
     translate([0, -34.2, -.1]) driveCutout();
-    translate([3, -32, -1]) cube([8,5,5]);
-    translate([51, -32, -1]) cube([8,5,5]); 
+    translate([3+servoShaftX-21, -32, -1]) cube([8,5,5]);
+    translate([51+servoShaftX-21, -32, -1]) cube([8,5,5]); 
   }
   translate([0, -1.5, 0]) cube([dim[0]/2*.9, 1.5, thk*2]);
 }
 
-module holePattern(xcnt, ycnt, xoff, yoff) {
+module holePattern(xcnt, ycnt, xoff, yoff, large=true) {
   // 3mm mount holes on 1cm centers
     for (x = [1:xcnt]) {
       for (y = [0:ycnt]) {
@@ -122,9 +126,11 @@ module holePattern(xcnt, ycnt, xoff, yoff) {
       }
     }
     // holes to cut the amount of filament
-    for (x = [1:xcnt-1]) {
-      for (y = [0:ycnt-1]) {
-        translate([x*10+xoff+5, y*10+yoff+5, -1]) cylinder(d=7, h=thk+3); 
+    if (large) {
+      for (x = [1:xcnt-1]) {
+        for (y = [0:ycnt-1]) {
+          translate([x*10+xoff+5, y*10+yoff+5, -1]) cylinder(d=7, h=thk+3); 
+        }
       }
     }
 }
@@ -132,7 +138,11 @@ module holePattern(xcnt, ycnt, xoff, yoff) {
 module top() {
   difference() {
     cube([dim[0], dim[1]/2, thk]);
-    holePattern(xcnt=13, ycnt=3, xoff=0, yoff=7.5);
+    translate([5,5,-1.5]) cube([dim[0]-10, dim[1]/2-4, thk]);
+    holePattern(xcnt=13, ycnt=3, xoff=0, yoff=7.5, large=false);
+    translate([10, 10.5, 1]) cube([20, 4, 5]);
+    translate([dim[0]-30, 10.5, 1]) cube([20, 4, 5]);
+    translate([dim[0]/2-10, 10.5, 1]) cube([20, 4, 5]);
   }
   
   for ( i = [0:2] ) {
@@ -210,7 +220,7 @@ module drawHalfBot() {
   
   if (drawWheelbase) {
     color("red") 
-      translate([servoShaftX, -dim[1]/2-20, servoShaftZ-1]) 
+      translate([servoShaftX, -dim[1]/2-21, servoShaftZ-1]) 
         wheelbase();
   }
   
@@ -237,4 +247,8 @@ if (drawBatteries) {
 
 if (drawFrontAxel) {
   frontAxel();
+}
+
+if (drawSideStiff) {
+  translate([0, -dim[1]/2-10+thk, dim[2]-7]) cube([dim[0], 10, 1.6]);
 }
